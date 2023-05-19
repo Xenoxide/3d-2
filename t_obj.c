@@ -67,10 +67,8 @@ void t_decodeOBJ(char* filename, t_Face* faces) {
         // 0 - normal
         // 1, 2, 3 - vertices
 
-        /* YOU WERE HERE */
-
         if (!(strcmp(token_array[0], "f"))) {
-            face_references[faces_index][0]
+            face_references[faces_index][0] = ;
         }
     }
     fclose(file);
