@@ -8,19 +8,30 @@
 #define MAX_NORMALS 5000
 #define MAX_FACES 5000
 
-// It takes in a "1/2/3" and returns a [1, 2, 3].
-void t_splitFace(char* in, int* out) {
-    char copy[6];
+// It takes in a ["f", "1/2/3", "1/2/3", "1/2/3"] 
+// and returns a [[1, 2, 3], [1, 2, 3], [1, 2, 3]].
+// Only used internally.
+void t_splitFace(char** token_array, int out[3][3]) {
+    char copy[17];
     char *token, *saveptr;
+    int out_index = 0;
 
-    strcpy(copy, in);
-    token = strtok_r(copy, "/", &saveptr);
+    // Tokenize input.
+    int i;
+    for (i = 0; i < 3; i++) {
+        // i + 1 because 0th term is "f".
+        strcpy(copy, token_array[i + 1]);
 
-    while (token != NULL) {
-        int number = atoi(token);
-        printf("%d\n", number);
+        // "1/2/3" --> "1"
+        token = strtok_r(copy, "/", &saveptr);
 
-        token = strtok_r(NULL, "/", &saveptr);
+        while (token != NULL) {
+            // Convert to integer, save to out[i]
+            out[i][out_index++] = atoi(token);
+            // "2/3" --> "2"    "3" --> "3" 
+            token = strtok_r(NULL, "/", &saveptr);
+        }
+        out_index = 0;
     }
 }
 
@@ -32,30 +43,35 @@ void t_decodeOBJ(char* filename, t_Face* faces) {
     FILE * file = fopen(filename, "r");
     char line_buffer[80];
     
-    char* token;
-    char* rest;
-    char* token_array[5];
+    char *token;
+    char* token_array[6];
     int token_index;
 
+    // Save the values.
     t_Point vertices[MAX_VERTICES];
     t_Point normals[MAX_NORMALS];
     int face_references[4][MAX_FACES];
 
+    // Which one am I on?
     int vertices_index = 0;
     int normals_index = 0;
     int faces_index = 0;
 
     // Line by line sequence
-    while(fgets(line_buffer, 80, file)) {
-
-        rest = line_buffer;
+    while(fgets(line_buffer, 80, file) != NULL) {
+        
+        // Copy string, otherwise same pointer. rest will be destroyed.
+        // It's ok to destroy line_buffer, because it is only used once.
+        char* rest = line_buffer;
         token_index = 0;
 
         // Token by token sequence
+
         while ((token = strtok_r(rest, " ", &rest))) {
             printf("%s\n", token);
             token_array[token_index++] = token;
         }
+        
 
         // Process lines
 
@@ -87,19 +103,42 @@ void t_decodeOBJ(char* filename, t_Face* faces) {
         // 1, 2, 3 - vertices
         // Returns integers instead of t_Point, it will
         // be processed later.
-
+        // Remember: Vertex/(ignore for now)/Vertex normal
         if (!(strcmp(token_array[0], "f"))) {
-            char* copy;
-            strcpy(copy, token_array[1]);
-            
+            int references[3][3];
+            t_splitFace(token_array, references);
+
+            // normal (same for all vertices, so use first one)
+            face_references[0][faces_index] = references[0][2]; // 2nd term, 0th token
+            face_references[1][faces_index] = references[0][0];
+            face_references[2][faces_index] = references[1][0];
+            face_references[3][faces_index] = references[2][0];
+            faces_index++;
         }
+
+        // End processing lines
     }
+    // Leave line processing sequence
+
+    // Associate points with faces.
+    int j;
+    for (j = 0; j < faces_index; j++) {
+        // *** SEGFAULT HERE ***
+        faces[j] = (t_Face) { // faces is the output
+            vertices[face_references[j][1]],
+            vertices[face_references[j][2]],
+            vertices[face_references[j][3]],
+             normals[face_references[j][0]]
+        };
+    }
+
     fclose(file);
 
 }
 
 int main() {
-    t_Face * face;
-    t_decodeOBJ("cube.txt", face);
+    t_Face face[MAX_FACES];
+    t_decodeOBJ("cube.obj", face);
+    
     return 0;
 }
