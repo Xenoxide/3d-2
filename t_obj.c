@@ -35,10 +35,19 @@ void t_splitFace(char** token_array, int out[3][3]) {
     }
 }
 
+// debugging function (remove later)
+void t_printFace(t_Face in) {
+    printf("Vertex 1: %f %f %f\n", in.p1.x, in.p1.y, in.p1.z);
+    printf("Vertex 2: %f %f %f\n", in.p2.x, in.p2.y, in.p2.z);
+    printf("Vertex 3: %f %f %f\n", in.p3.x, in.p3.y, in.p3.z);
+    printf("Normal: %f %f %f\n\n", in.normal.x, in.normal.y, in.normal.z);
+}
+
 // Takes in the filename of the obj file, and puts an
 // array of faces in the second argument t_Face* faces.
 // t_Face* is not a pointer to a face, but an array of faces.
-void t_decodeOBJ(char* filename, t_Face* faces) {
+// Return value is number of faces
+int t_decodeOBJ(char* filename, t_Face faces[MAX_FACES]) {
 
     FILE * file = fopen(filename, "r");
     char line_buffer[80];
@@ -78,7 +87,7 @@ void t_decodeOBJ(char* filename, t_Face* faces) {
         // "v" Vertex
         if(!(strcmp(token_array[0], "v"))) {
             // Haha... don't want to mess up the memory...
-            if (vertices_index == MAX_VERTICES) return;
+            if (vertices_index == MAX_VERTICES) return 0;
             vertices[vertices_index++] = (t_Point) {
                 atof(token_array[1]),
                 atof(token_array[2]),
@@ -89,7 +98,7 @@ void t_decodeOBJ(char* filename, t_Face* faces) {
 
         // "vn" Normal
         if(!(strcmp(token_array[0], "vn"))) {
-            if (normals_index == MAX_NORMALS) return;
+            if (normals_index == MAX_NORMALS) return 0;
             normals[normals_index++] = (t_Point) {
                 atof(token_array[1]),
                 atof(token_array[2]),
@@ -125,20 +134,24 @@ void t_decodeOBJ(char* filename, t_Face* faces) {
     for (j = 0; j < faces_index; j++) {
         // *** SEGFAULT HERE ***
         faces[j] = (t_Face) { // faces is the output
-            vertices[face_references[j][1]],
-            vertices[face_references[j][2]],
-            vertices[face_references[j][3]],
-             normals[face_references[j][0]]
+            vertices[face_references[1][j]],
+            vertices[face_references[2][j]],
+            vertices[face_references[3][j]],
+             normals[face_references[0][j]]
         };
     }
 
     fclose(file);
+    return faces_index + 1;
 
 }
 
 int main() {
     t_Face face[MAX_FACES];
-    t_decodeOBJ("cube.obj", face);
+    int num = t_decodeOBJ("cube.obj", face);
+    int i;
+    for (i = 0; i < num; i++)
+        t_printFace(face[i]);
     
     return 0;
 }
