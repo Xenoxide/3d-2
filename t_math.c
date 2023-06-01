@@ -1,7 +1,7 @@
 #include "t_math.h"
 
 // out = m1*m2
-void t_multi(t_Matrix* m1, t_Matrix* m2, t_Matrix* out) {
+void t_multiMM(t_Matrix* m1, t_Matrix* m2, t_Matrix* out) {
 
     int i,j,k;
     float s;
@@ -15,6 +15,18 @@ void t_multi(t_Matrix* m1, t_Matrix* m2, t_Matrix* out) {
     }
 }
 
+void t_multiMV(t_Matrix * m1, t_Point * v1, t_Point * out)
+{
+    int i, j;
+    for (i = 0; i < 3; i++)
+    {
+        out->m[i] = 0.0;
+        for (j = 0; j < 3; j++)
+        {
+            out->m[i] += m1->m[i][j] * v1->m[i];
+        };
+    }
+}
 void t_rotate(float angle, int axis, t_Matrix* out) {
     float s = sinf(angle);
     float c = cosf(angle);

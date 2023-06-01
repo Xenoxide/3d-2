@@ -72,23 +72,23 @@ int t_decodeOBJ(char* filename, t_Face faces[MAX_FACES]) {
         if(!(strcmp(token_array[0], "v"))) {
             // Haha... don't want to mess up the memory...
             if (vertices_index == MAX_VERTICES) return 0;
-            vertices[vertices_index++] = (t_Point) {
+            vertices[vertices_index++] = (t_Point) {{
                 atof(token_array[1]),
                 atof(token_array[2]),
                 atof(token_array[3]),
                 1
-            };
+            }};
         }
 
         // "vn" Normal
         if(!(strcmp(token_array[0], "vn"))) {
             if (normals_index == MAX_NORMALS) return 0;
-            normals[normals_index++] = (t_Point) {
+            normals[normals_index++] = (t_Point) {{
                 atof(token_array[1]),
                 atof(token_array[2]),
                 atof(token_array[3]),
                 1
-            };
+            }};
         }
 
         // "f" Face (3 sides)
@@ -116,7 +116,6 @@ int t_decodeOBJ(char* filename, t_Face faces[MAX_FACES]) {
     // Associate points with faces.
     int j;
     for (j = 0; j < faces_index; j++) {
-        // *** SEGFAULT HERE ***
         faces[j] = (t_Face) { // faces is the output
             vertices[face_references[1][j]],
             vertices[face_references[2][j]],

@@ -13,11 +13,18 @@
 // struct definitions
 // t_Point (vector), t_Matrix
 
+/*
 typedef struct {
     float x;
     float y;
     float z;
     float w;
+} t_Point;
+*/
+
+// This is a better way to represent points. As an array.
+typedef struct {
+    float m[4];
 } t_Point;
 
 // Matrices are defined left to right, top to bottom
@@ -46,6 +53,8 @@ const t_Matrix IDENTITY = (t_Matrix) {{
 
 // Function definitions
 
-void t_multi(t_Matrix* m1, t_Matrix* m2, t_Matrix* out);
+void t_multiMM(t_Matrix* m1, t_Matrix* m2, t_Matrix* out);
+void t_multiMV(t_Matrix* m1, t_Point* v1, t_Point* out);
 void t_rotate(float angle, int axis, t_Matrix* out);
-#endif
+
+#endif //ifndef T_MATH_H
