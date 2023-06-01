@@ -1,12 +1,7 @@
-#include <math.h>
 #include "t_math.h"
 
-#define X_AXIS 0
-#define Y_AXIS 1
-#define Z_AXIS 2
-
 // out = m1*m2
-void t_multi(t_M4* m1, t_M4* m2, t_M4* out) {
+void t_multi(t_Matrix* m1, t_Matrix* m2, t_Matrix* out) {
 
     int i,j,k;
     float s;
@@ -20,11 +15,11 @@ void t_multi(t_M4* m1, t_M4* m2, t_M4* out) {
     }
 }
 
-void t_rotate(float angle, int axis, t_M4* out) {
+void t_rotate(float angle, int axis, t_Matrix* out) {
     float s = sinf(angle);
     float c = cosf(angle);
 
-    t_M4 *tmp;
+    t_Matrix *tmp;
     *tmp = IDENTITY;
 
     // Construct the rotation matrices by substituting

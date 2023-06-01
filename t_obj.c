@@ -1,17 +1,9 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-#include "t_math.h"
-
-#define MAX_VERTICES 10000
-#define MAX_NORMALS 5000
-#define MAX_FACES 5000
+#include "t_obj.h"
 
 // It takes in a ["f", "1/2/3", "1/2/3", "1/2/3"] 
 // and returns a [[1, 2, 3], [1, 2, 3], [1, 2, 3]].
 // Only used internally.
-void t_splitFace(char** token_array, int out[3][3]) {
+static void t_splitFace(char** token_array, int out[3][3]) {
     char copy[17];
     char *token, *saveptr;
     int out_index = 0;
@@ -35,18 +27,10 @@ void t_splitFace(char** token_array, int out[3][3]) {
     }
 }
 
-// debugging function (remove later)
-void t_printFace(t_Face in) {
-    printf("Vertex 1: %f %f %f\n", in.p1.x, in.p1.y, in.p1.z);
-    printf("Vertex 2: %f %f %f\n", in.p2.x, in.p2.y, in.p2.z);
-    printf("Vertex 3: %f %f %f\n", in.p3.x, in.p3.y, in.p3.z);
-    printf("Normal: %f %f %f\n\n", in.normal.x, in.normal.y, in.normal.z);
-}
-
 // Takes in the filename of the obj file, and puts an
 // array of faces in the second argument t_Face* faces.
 // t_Face* is not a pointer to a face, but an array of faces.
-// Return value is number of faces
+// Return value is number of faces, zero in case of failure.
 int t_decodeOBJ(char* filename, t_Face faces[MAX_FACES]) {
 
     FILE * file = fopen(filename, "r");
@@ -144,14 +128,4 @@ int t_decodeOBJ(char* filename, t_Face faces[MAX_FACES]) {
     fclose(file);
     return faces_index + 1;
 
-}
-
-int main() {
-    t_Face face[MAX_FACES];
-    int num = t_decodeOBJ("cube.obj", face);
-    int i;
-    for (i = 0; i < num; i++)
-        t_printFace(face[i]);
-    
-    return 0;
 }
