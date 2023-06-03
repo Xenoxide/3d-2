@@ -3,12 +3,15 @@
 
 // includes
 #include <math.h>
+#include <string.h>
 
 // macros
 #define X_AXIS 0
 #define Y_AXIS 1
 #define Z_AXIS 2
 
+// multiply by to convert degrees to radians
+#define C 0.01745278
 
 // struct definitions
 // t_Point (vector), t_Matrix
@@ -45,10 +48,10 @@ typedef struct {
 } t_Face;
 
 const t_Matrix IDENTITY = (t_Matrix) {{
-    {1, 0, 0, 0}, 
-    {0, 1, 0, 0},
-    {0, 0, 1, 0},
-    {0, 0, 0, 1}
+    {1.0, 0.0, 0.0, 0.0}, 
+    {0.0, 1.0, 0.0, 0.0},
+    {0.0, 0.0, 1.0, 0.0},
+    {0.0, 0.0, 0.0, 1.0}
 }};
 
 // Function definitions
@@ -56,5 +59,6 @@ const t_Matrix IDENTITY = (t_Matrix) {{
 void t_multiMM(t_Matrix* m1, t_Matrix* m2, t_Matrix* out);
 void t_multiMV(t_Matrix* m1, t_Point* v1, t_Point* out);
 void t_rotate(float angle, int axis, t_Matrix* out);
+t_Matrix t_genProj(float* w, float* h, float* FOV);
 
 #endif //ifndef T_MATH_H

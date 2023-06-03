@@ -28,11 +28,11 @@ void t_multiMV(t_Matrix * m1, t_Point * v1, t_Point * out)
     }
 }
 void t_rotate(float angle, int axis, t_Matrix* out) {
-    float s = sinf(angle);
-    float c = cosf(angle);
+    float s = sinf(angle * C);
+    float c = cosf(angle * C);
 
     t_Matrix *tmp;
-    *tmp = IDENTITY;
+    memcpy(tmp, &IDENTITY, sizeof(t_Matrix));
 
     // Construct the rotation matrices by substituting
     // into the identity matrix
@@ -53,4 +53,30 @@ void t_rotate(float angle, int axis, t_Matrix* out) {
             tmp->m[1][0] =  s; tmp->m[1][1] =  c;
             break;
     }
+}
+
+// w - width
+// h - height
+// FOV - field of view (in degrees)
+// 1 and 1000 are used for near and far planes
+t_Matrix t_genProj(float *w, float *h, float *FOV) {
+    float AR, FOV_R, t, b, l, r; // top, bottom, left, right
+    float f = 1000.0; // far
+    float n = 1.0;    // near
+
+    AR = *w / *h; // aspect ratio
+    FOV_R = *FOV * C;
+    t = n * tan(FOV_R / 2);
+    b = -t;
+    r = t * AR;
+    l = -r;
+
+    // Simplified, because r + l = 0, and r - l = 2r (same with t, b)
+    t_Matrix out = {{
+        {n / r, 0,     0,                0},
+        {0,     n / t, 0,                0},
+        {0,     0,     -(f + n)/(f - n), -2 * f * n / (f - n)},
+        {0,     0,     -1,               0}
+    }};
+    return out;
 }

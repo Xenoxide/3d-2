@@ -10,57 +10,66 @@
 int main(int argc, char *argv[]) {
 
     // Process input {
-    if (strcmp(argv[1], "help") || strcmp(argv[1], "")) {
-        printf("Start program like this:\n./render FILE.OBJ WIDTH HEIGHT");
-        return 0;
-    }
-    char filename[256];
-    strcpy(filename, argv[1]);
-    int WIDTH = atoi(argv[2]);
-    int HEIGHT = atoi(argv[3]);
+        if (strcmp(argv[1], "help") || strcmp(argv[1], "")) {
+            printf("Start program like this:\n./render FILE.OBJ WIDTH HEIGHT");
+            return 0;
+        }
+        char filename[256];
+        strcpy(filename, argv[1]);
+        float WIDTH = atof(argv[2]);
+        float HEIGHT = atof(argv[3]);
 
-    t_Face faces[MAX_FACES];
-    int faces_count = t_decodeOBJ(filename, faces);
+        t_Face faces[MAX_FACES];
+        int faces_count = t_decodeOBJ(filename, faces);
     // }
 
     // Event handling {
-    int quit = 0;
-    int leftMouseButtonDown = 0;
-    SDL_Event event;
+        int quit = 0;
+        int leftMouseButtonDown = 0;
+        SDL_Event event;
     // }
 
     // Create screen {
-    SDL_Init(SDL_INIT_VIDEO);
- 
-    SDL_Window * window = SDL_CreateWindow(
-        "SDL2 Pixel Drawing",
-        SDL_WINDOWPOS_UNDEFINED, 
-        SDL_WINDOWPOS_UNDEFINED, 
-        WIDTH, HEIGHT, 
-        0);
+        SDL_Init(SDL_INIT_VIDEO);
     
-    SDL_Renderer * renderer = SDL_CreateRenderer(
-        window, 
-        -1, 
-        0);
+        SDL_Window * window = SDL_CreateWindow(
+            "SDL2 Pixel Drawing",
+            SDL_WINDOWPOS_UNDEFINED, 
+            SDL_WINDOWPOS_UNDEFINED, 
+            WIDTH, HEIGHT, 
+            0);
+        
+        SDL_Renderer * renderer = SDL_CreateRenderer(
+            window, 
+            -1, 
+            0);
 
-    SDL_Texture * texture = SDL_CreateTexture(
-        renderer,
-        SDL_PIXELFORMAT_ARGB8888,
-        SDL_TEXTUREACCESS_STATIC, 
-        WIDTH, HEIGHT);
-    
-    Uint32 * pixels = malloc(WIDTH * HEIGHT * sizeof(Uint32));
+        SDL_Texture * texture = SDL_CreateTexture(
+            renderer,
+            SDL_PIXELFORMAT_ARGB8888,
+            SDL_TEXTUREACCESS_STATIC, 
+            WIDTH, HEIGHT);
+        
+        Uint32 * pixels = malloc(WIDTH * HEIGHT * sizeof(Uint32));
 
-    // memset sets an area of memory to one value
-    memset(pixels, 255, WIDTH * HEIGHT * sizeof(Uint32));
+        // memset sets an area of memory to one value
+        memset(pixels, 255, WIDTH * HEIGHT * sizeof(Uint32));
     // }
 
+    // Call library function {
+        float FOV = 90; //default
+
+        // call every time FOV changes, WIDTH and HEIGHT are constant.
+        t_Matrix proj = t_genProj(&WIDTH, &HEIGHT, &FOV);
+        
+    // }
+
+    // Main loop
     while (!quit)
     {
         SDL_UpdateTexture(texture, NULL, pixels, WIDTH * sizeof(Uint32));
 
-        SDL_PollEvent(&event);
+        SDL_WaitEvent(&event);
  
         switch (event.type)
         {
@@ -69,7 +78,12 @@ int main(int argc, char *argv[]) {
                 break;
             
             // Put cases for input here:
+            case SDL_MOUSEWHEEL:
+                if (event.wheel.y > 0) FOV++;
+                if (event.wheel.y < 0) FOV--;
 
+                proj = t_genProj(&WIDTH, &HEIGHT, &FOV);
+                break;
             
         }
 
@@ -79,7 +93,8 @@ int main(int argc, char *argv[]) {
         SDL_RenderPresent(renderer);
     }
     
-    // deallocate memory
+    // After main loop terminates.
+    // free memory
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     free(pixels);

@@ -76,7 +76,7 @@ int t_decodeOBJ(char* filename, t_Face faces[MAX_FACES]) {
                 atof(token_array[1]),
                 atof(token_array[2]),
                 atof(token_array[3]),
-                1
+                1.0
             }};
         }
 
@@ -87,7 +87,7 @@ int t_decodeOBJ(char* filename, t_Face faces[MAX_FACES]) {
                 atof(token_array[1]),
                 atof(token_array[2]),
                 atof(token_array[3]),
-                1
+                1.0
             }};
         }
 
