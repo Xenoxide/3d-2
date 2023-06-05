@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
     {
         SDL_UpdateTexture(texture, NULL, pixels, WIDTH * sizeof(Uint32));
 
-        SDL_WaitEvent(&event);
+        SDL_PollEvent(&event);
  
         switch (event.type)
         {
@@ -86,6 +86,14 @@ int main(int argc, char *argv[]) {
                 break;
             
         }
+        // Rendering loop {
+            int i;
+            for (i = 0; i < faces_count; i++)
+                t_reorderFace(&(faces[i]));
+            
+            
+            
+        // }
 
         // clear, fill, and publish screen.
         SDL_RenderClear(renderer);
