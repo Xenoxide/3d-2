@@ -61,7 +61,6 @@ int t_decodeOBJ(char* filename, t_Face faces[MAX_FACES]) {
         // Token by token sequence
 
         while ((token = strtok_r(rest, " ", &rest))) {
-            printf("%s\n", token);
             token_array[token_index++] = token;
         }
         

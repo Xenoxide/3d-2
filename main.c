@@ -5,35 +5,49 @@
 #include "t_obj.h"
 #include "t_math.h"
 
-// copied in some boilerplate
-
 int main(int argc, char *argv[]) {
 
+    t_Model camera = (t_Model) {
+        {0, 0, 1}, // pos
+        {0, 0, 0}  // rot
+    };
+
+    t_Model object = (t_Model) {
+        {0, 0, 0}, 
+        {0, 0, 0}
+    };
+    
+    t_Matrix proj;
+    t_Matrix view;
+    t_Matrix model;
+
     // Process input {
-        if (strcmp(argv[1], "help") || strcmp(argv[1], "")) {
-            printf("Start program like this:\n./render FILE.OBJ WIDTH HEIGHT");
-            return 0;
-        }
+
         char filename[256];
         strcpy(filename, argv[1]);
-        float WIDTH = atof(argv[2]);
-        float HEIGHT = atof(argv[3]);
+        int WIDTH = atoi(argv[2]);
+        int HEIGHT = atoi(argv[3]);
+
+        printf("Got input: resolution: %dx%d, file: %s\n", WIDTH, HEIGHT, filename);
 
         t_Face faces[MAX_FACES];
+        t_Face tr_faces[MAX_FACES];
         int faces_count = t_decodeOBJ(filename, faces);
+
+        printf("Rendering %d triangles.\n", faces_count);
     // }
 
     // Event handling {
         int quit = 0;
-        int leftMouseButtonDown = 0;
         SDL_Event event;
+        int mouseDown = 0;
     // }
 
     // Create screen {
         SDL_Init(SDL_INIT_VIDEO);
     
         SDL_Window * window = SDL_CreateWindow(
-            "SDL2 Pixel Drawing",
+            "rendering window",
             SDL_WINDOWPOS_UNDEFINED, 
             SDL_WINDOWPOS_UNDEFINED, 
             WIDTH, HEIGHT, 
@@ -56,11 +70,22 @@ int main(int argc, char *argv[]) {
         memset(pixels, 255, WIDTH * HEIGHT * sizeof(Uint32));
     // }
 
-    // Call library function {
+    // Call library functions {
         float FOV = 90; //default
 
-        // call every time FOV changes, WIDTH and HEIGHT are constant.
-        t_Matrix proj = t_genProj(&WIDTH, &HEIGHT, &FOV);
+        // call when FOV changes.
+        t_genProj(&proj, &WIDTH, &HEIGHT, &FOV);
+
+        // call when object model changes.
+        t_genModel(&model, &object);
+
+        // call when camera model changes.
+        t_genView(&view, &camera);
+
+        // Put faces in correct order
+        int i;
+        for (i = 0; i < faces_count; i++)
+            t_reorderFace(&(faces[i]));
         
     // }
 
@@ -69,6 +94,7 @@ int main(int argc, char *argv[]) {
     {
         SDL_UpdateTexture(texture, NULL, pixels, WIDTH * sizeof(Uint32));
 
+        SDL_Delay(10);
         SDL_PollEvent(&event);
  
         switch (event.type)
@@ -82,17 +108,46 @@ int main(int argc, char *argv[]) {
                 if (event.wheel.y > 0) FOV++;
                 if (event.wheel.y < 0) FOV--;
 
-                proj = t_genProj(&WIDTH, &HEIGHT, &FOV);
+                t_genProj(&proj, &WIDTH, &HEIGHT, &FOV);
+                printf("Regenerated projection matrix with FOV: %f.\n", FOV);
+                break;
+            
+            case SDL_MOUSEBUTTONDOWN:
+                mouseDown = 1;
+                break;
+            
+            case SDL_MOUSEBUTTONUP:
+                mouseDown = 0;
+                break;
+            
+            case SDL_MOUSEMOTION:
+                if (mouseDown) {
+                    if(event.motion.xrel > 0) camera.rot[_Y]++;
+                    if(event.motion.xrel < 0) camera.rot[_Y]--;
+                    if(event.motion.yrel > 0) camera.rot[_X]++;
+                    if(event.motion.yrel < 0) camera.rot[_X]--;
+                    t_genView(&view, &camera);
+                    printf("Regenerated view matrix with camera rotation: (%f, %f, %f).\n", camera.rot[_X], camera.rot[_Y], camera.rot[_Z]);
+                }
                 break;
             
         }
         // Rendering loop {
-            int i;
-            for (i = 0; i < faces_count; i++)
-                t_reorderFace(&(faces[i]));
-            
-            
-            
+            t_project(&proj, &view, &model, faces, tr_faces, faces_count, WIDTH, HEIGHT);
+            for (i = 0; i < faces_count; i++) {
+                t_drawLine(
+                    tr_faces->p1.m[_X], tr_faces->p1.m[_Y],
+                    tr_faces->p2.m[_X], tr_faces->p2.m[_Y],
+                    pixels, WIDTH, HEIGHT);
+                t_drawLine(
+                    tr_faces->p2.m[_X], tr_faces->p2.m[_Y],
+                    tr_faces->p3.m[_X], tr_faces->p3.m[_Y],
+                    pixels, WIDTH, HEIGHT);
+                t_drawLine(
+                    tr_faces->p1.m[_X], tr_faces->p1.m[_Y],
+                    tr_faces->p3.m[_X], tr_faces->p3.m[_Y],
+                    pixels, WIDTH, HEIGHT);
+            }
         // }
 
         // clear, fill, and publish screen.
