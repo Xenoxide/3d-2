@@ -1,3 +1,7 @@
+// This program is fragile.
+// A comment in the obj file that's too long will overflow the buffer.
+// A double space between two values is counted as a zero. Then the last value
+// will overflow the buffer.
 #include "t_obj.h"
 
 // It takes in a ["f", "1/2/3", "1/2/3", "1/2/3"] 

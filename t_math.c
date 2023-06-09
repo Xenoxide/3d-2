@@ -1,6 +1,12 @@
 #include "t_math.h"
 #include <stdint.h>
 
+void t_printMatrix(t_Matrix* m1) {
+    int row;
+    for (row = 0; row < 4; row++)
+        printf("[ %f %f %f %f ]\n", m1->m[row][0], m1->m[row][1], m1->m[row][2], m1->m[row][3]);
+}
+
 // out = m1*m2
 void t_multiMM(t_Matrix* m1, t_Matrix* m2, t_Matrix* out) {
 
@@ -28,6 +34,8 @@ void t_multiMV(t_Matrix * m1, t_Point * v1, t_Point * out)
         };
     }
 }
+
+// test 2
 void t_rotate(float angle, int axis, t_Matrix* out) {
     float s = sinf(angle * C);
     float c = cosf(angle * C);
