@@ -168,7 +168,7 @@ void t_transpose(t_Matrix *m1) {
 // [0 1 0 Y].
 // [0 0 1 Z].
 // [0 0 0 1].
-void t_translate(t_Matrix *in, float translation[3], t_Matrix *out) {
+void t_translate(t_Matrix *in, float translation[3]) {
     in->m[_X][3] = translation[_X];
     in->m[_Y][3] = translation[_Y];
     in->m[_Z][3] = translation[_Z];
@@ -192,7 +192,8 @@ void t_genModel(t_Matrix *out, t_Model * model) {
     t_multiMM(&r, &z, &r);
 
     // Combine translation with rotation matrix
-    t_translate(&r, model->pos, out);
+    t_translate(&r, model->pos);
+    *out = r;
 }
 
 void t_genView(t_Matrix* viewMatrix, t_Model * model) {
@@ -232,7 +233,12 @@ void t_divPer(t_Face * in, int WIDTH, int HEIGHT) {
     in->p3.m[_Y] = in->p3.m[_Y] * H2 + H2;
 }
 
-void t_drawLine(int x1, int y1, int x2, int y2, uint32_t* pixels, int WIDTH, int HEIGHT) {
+void t_drawLine(int _x1, int _y1, int _x2, int _y2, uint32_t* pixels, int WIDTH, int HEIGHT) {
+    int x1 = _x1,
+        x2 = _x2,
+        y1 = _y1,
+        y2 = _y2;
+    
     int dx = abs(x2 - x1);
     int dy = abs(y2 - y1);
     int sx = (x1 < x2) ? 1 : -1;
@@ -242,6 +248,9 @@ void t_drawLine(int x1, int y1, int x2, int y2, uint32_t* pixels, int WIDTH, int
     while (x1 != x2 || y1 != y2) {
         if (x1 >= 0 && x1 < WIDTH && y1 >= 0 && y1 < HEIGHT) {
             pixels[y1 * WIDTH + x1] = 0;  // Set pixel to desired color value
+            printf("Line: (%d, %d) to (%d, %d).\n", x1, y1, x2, y2);
+        } else {
+            printf("Failed to draw line: (%d, %d) to (%d, %d).\n", x1, y1, x2, y2);
         }
         int err2 = 2 * err;
         if (err2 > -dy) {
@@ -262,7 +271,6 @@ void t_project(t_Matrix *proj, t_Matrix *view, t_Matrix *model, t_Face faces[MAX
 
     int i;
     
-
     // Apply matrices
     t_Face transformed_faces[MAX_FACES];
     for (i = 0; i < faces_count; i++) {

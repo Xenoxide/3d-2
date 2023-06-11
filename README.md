@@ -1,9 +1,15 @@
 # 3d-2
 
-Old README:
-The first 3D was just by reading Wikipedia articles, which is hardly helpful. I have borrowed the book "Computer Graphics from Scratch: A Programmer's Introduction to 3D Rendering" from the library. This is what I will use for this.
+This project is an experiment in 3D projection. I am learning about C and 3D rendering at the same time. It uses SDL to take input and draw to the screen. I'll just say, I've learned a lot doing this.
 
-This project uses SDL2 to implement a `PutPixel()` function. I can't think of another way to do this. It also has an interface to keyboard and mouse which could be helpful.
+For the corresponding presentation, [Xenoxide/3d-2-presentation](https://github.com/Xenoxide/3d-2-presentation).
 
-Update:
-This project was originally abandoned on creation, but now it is being done as a school project. This is a retry of a previous project.
+Compile using:
+```sh
+gcc main.c t_obj.c t_math.c -lSDL2 -lSDL2main -lm
+```
+Run with ./a.out OBJECT.obj WIDTH HEIGHT
+Compile unit tests using:
+```sh
+gcc unit_tests.c t_obj.c t_math.c -lm
+```

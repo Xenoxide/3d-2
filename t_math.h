@@ -13,6 +13,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdio.h>
 
 // macros
 #define X_AXIS 0
@@ -76,6 +77,9 @@ typedef struct {
 
 // Function definitions
 
+// debug
+void t_printMatrix(t_Matrix* m1);
+
 void t_multiMM(t_Matrix* m1, t_Matrix* m2, t_Matrix* out);
 void t_multiMV(t_Matrix* m1, t_Point* v1, t_Point* out);
 void t_rotate(float angle, int axis, t_Matrix* out);
@@ -84,7 +88,7 @@ void t_vectSub(t_Point* v1, t_Point* v2, t_Point* out);
 float t_vectDot(t_Point* v1, t_Point* v2);
 void t_vectCross(t_Point* v1, t_Point* v2, t_Point* out);
 void t_reorderFace(t_Face *in);
-void t_translate(t_Matrix *in, float translation[3], t_Matrix *out);
+void t_translate(t_Matrix *in, float translation[3]);
 void t_transpose(t_Matrix *m1);
 void t_genProj(t_Matrix * proj, int* w, int* h, float* FOV);
 void t_genView(t_Matrix* viewMatrix, t_Model * model);

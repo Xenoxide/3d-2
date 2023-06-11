@@ -109,7 +109,6 @@ int main(int argc, char *argv[]) {
                 if (event.wheel.y < 0) FOV--;
 
                 t_genProj(&proj, &WIDTH, &HEIGHT, &FOV);
-                printf("Regenerated projection matrix with FOV: %f.\n", FOV);
                 break;
             
             case SDL_MOUSEBUTTONDOWN:
@@ -127,7 +126,6 @@ int main(int argc, char *argv[]) {
                     if(event.motion.yrel > 0) camera.rot[_X]++;
                     if(event.motion.yrel < 0) camera.rot[_X]--;
                     t_genView(&view, &camera);
-                    printf("Regenerated view matrix with camera rotation: (%f, %f, %f).\n", camera.rot[_X], camera.rot[_Y], camera.rot[_Z]);
                 }
                 break;
             
@@ -136,22 +134,27 @@ int main(int argc, char *argv[]) {
             t_project(&proj, &view, &model, faces, tr_faces, faces_count, WIDTH, HEIGHT);
             for (i = 0; i < faces_count; i++) {
                 t_drawLine(
-                    tr_faces->p1.m[_X], tr_faces->p1.m[_Y],
-                    tr_faces->p2.m[_X], tr_faces->p2.m[_Y],
+                    tr_faces[i].p1.m[_X], tr_faces[i].p1.m[_Y],
+                    tr_faces[i].p2.m[_X], tr_faces[i].p2.m[_Y],
                     pixels, WIDTH, HEIGHT);
                 t_drawLine(
-                    tr_faces->p2.m[_X], tr_faces->p2.m[_Y],
-                    tr_faces->p3.m[_X], tr_faces->p3.m[_Y],
+                    tr_faces[i].p2.m[_X], tr_faces[i].p2.m[_Y],
+                    tr_faces[i].p3.m[_X], tr_faces[i].p3.m[_Y],
                     pixels, WIDTH, HEIGHT);
                 t_drawLine(
-                    tr_faces->p1.m[_X], tr_faces->p1.m[_Y],
-                    tr_faces->p3.m[_X], tr_faces->p3.m[_Y],
+                    tr_faces[i].p1.m[_X], tr_faces[i].p1.m[_Y],
+                    tr_faces[i].p3.m[_X], tr_faces[i].p3.m[_Y],
                     pixels, WIDTH, HEIGHT);
+
+                printf("Drew face ((%f, %f), (%f, %f), (%f, %f))\n", 
+                tr_faces[i].p1.m[_X], tr_faces[i].p1.m[_Y],
+                tr_faces[i].p2.m[_X], tr_faces[i].p2.m[_Y],
+                tr_faces[i].p3.m[_X], tr_faces[i].p3.m[_Y]);
             }
         // }
 
         // clear, fill, and publish screen.
-        SDL_RenderClear(renderer);
+        // SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
     }
