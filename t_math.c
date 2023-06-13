@@ -234,6 +234,7 @@ void t_divPer(t_Face * in, int WIDTH, int HEIGHT) {
 }
 
 void t_drawLine(int _x1, int _y1, int _x2, int _y2, uint32_t* pixels, int WIDTH, int HEIGHT) {
+    printf("I got the input ((%d, %d), (%d, %d)).\n", _x1, _y1, _x2, _y2);
     int x1 = _x1,
         x2 = _x2,
         y1 = _y1,
@@ -245,12 +246,12 @@ void t_drawLine(int _x1, int _y1, int _x2, int _y2, uint32_t* pixels, int WIDTH,
     int sy = (y1 < y2) ? 1 : -1;
     int err = dx - dy;
 
+    if (x1 < 0 || x2 < 0 || y1 < 0 || y2 < 0)
+        return;
+
     while (x1 != x2 || y1 != y2) {
         if (x1 >= 0 && x1 < WIDTH && y1 >= 0 && y1 < HEIGHT) {
             pixels[y1 * WIDTH + x1] = 0;  // Set pixel to desired color value
-            printf("Line: (%d, %d) to (%d, %d).\n", x1, y1, x2, y2);
-        } else {
-            printf("Failed to draw line: (%d, %d) to (%d, %d).\n", x1, y1, x2, y2);
         }
         int err2 = 2 * err;
         if (err2 > -dy) {
@@ -268,18 +269,26 @@ void t_project(t_Matrix *proj, t_Matrix *view, t_Matrix *model, t_Face faces[MAX
     t_Matrix T;
     t_multiMM(model, view, &T);
     t_multiMM(&T, proj, &T);
+    t_Matrix scale = (t_Matrix) {{
+        {0.1, 0, 0, 0},
+        {0, 0.1, 0, 0},
+        {0, 0, 0.1, 0},
+        {0, 0, 0, 1}
+    }};
+    t_multiMM(&T, &scale, &T);
 
     int i;
     
     // Apply matrices
-    t_Face transformed_faces[MAX_FACES];
+
     for (i = 0; i < faces_count; i++) {
-        t_multiMV(&T, &(faces[i].p1), &(transformed_faces[i].p1));
-        t_multiMV(&T, &(faces[i].p2), &(transformed_faces[i].p2));
-        t_multiMV(&T, &(faces[i].p3), &(transformed_faces[i].p3));
+        t_multiMV(&T, &(faces[i].p1), &(out[i].p1));
+        t_multiMV(&T, &(faces[i].p2), &(out[i].p2));
+        t_multiMV(&T, &(faces[i].p3), &(out[i].p3));
 
         // perspective division or something
-        t_divPer(&(transformed_faces[i]), WIDTH, HEIGHT);
+        t_divPer(&(out[i]), WIDTH, HEIGHT);
+
     }    
     
 }

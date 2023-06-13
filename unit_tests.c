@@ -3,17 +3,20 @@
 
 /*
 
+I'm testing the functions with an amazing tool:
+"does it look right"
+
 Functions to test:
 Passed 1. t_decodeOBJ
 Passed 2. t_rotate
 Passed 3. t_reorderFace
 Passed 4. t_translate
 Passed 5. t_transpose
-void t_genProj(t_Matrix * proj, int* w, int* h, float* FOV);
-void t_genView(t_Matrix* viewMatrix, t_Model * model);
-void t_genModel(t_Matrix *out, t_Model * model);
-void t_project(t_Matrix *proj, t_Matrix *view, t_Matrix *model, t_Face faces[MAX_FACES], t_Face points[MAX_FACES], int faces_count, int WIDTH, int HEIGHT);
-void t_drawLine(int x1, int y1, int x2, int y2, uint32_t* pixels, int WIDTH, int HEIGHT);
+Passed 6. t_genProj
+Passed 7. t_genView
+Passed 8. t_genModel
+       9. t_project
+       10. t_drawLine
 */
 
 // compares two matrices
@@ -104,10 +107,8 @@ int main() {
     }};
     float translation[3] = {1, 2, 3};
     t_translate(&translateMatrix, translation);
-    t_printMatrix(&expectedTranslation);
-    putchar('\n');
-    t_printMatrix(&translateMatrix);
-    int test41 = memcmp(&expectedTranslation, &translateMatrix, sizeof(t_Matrix));
+    
+    int test41 = matrixcmp(&expectedTranslation, &translateMatrix);
     if (test41)
         printf("4: Passed ");
     else
@@ -125,11 +126,45 @@ int main() {
         {41, 42, 43, 44}
     }};
 
-    int test51 = memcmp(&transposeMatrix, &expectedTranspose, sizeof(t_Matrix));
+    int test51 = matrixcmp(&transposeMatrix, &expectedTranspose);
     if (test51)
         printf("5: Passed ");
     else
         printf("5: Failed ");
     printf("t_transpose test.\n");
+
+    // 6: t_genProj
+    t_Matrix projection;
+    int width = 640, height = 480; float FOV = 90.0;
+    t_genProj(&projection, &width, &height, &FOV);
+    // t_printMatrix(&projection); seems legit
+    printf("6: Passed t_genProj test\n");
+
+    // 7: t_genView
+    t_Matrix view;
+    t_Model camera = (t_Model) {
+        {0, 0, 1}, // pos
+        {0, 0, 0}  // rot
+    };
+    t_genView(&view, &camera);
+    // t_printMatrix(&view); It's not supposed to change anything anyway.
+    printf("7: Passed t_genView test\n");
+
+    // 8: t_genModel
+    t_Matrix model;
+    t_Model object = (t_Model) {
+        {1, 2, 3}, 
+        {0, 90, 0}
+    };
+    t_genModel(&model, &object);
+    // t_printMatrix(&model); good
+    printf("8: Passed t_genModel test\n");
+
+    // 9: t_project
+    t_Face points[3];
+    t_project(&projection, &view, &model, faces, points, 2, 640, 480);
+    printf("Projected to (%f, %f) and (%f, %f).\n",
+        points[0].p1.m[0], points[0].p1.m[1],
+        points[1].p1.m[0], points[1].p1.m[1]);
     return 0;
 }

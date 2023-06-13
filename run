@@ -1,0 +1,4 @@
+#!/bin/bash
+gcc main.c t_math.c t_obj.c -lm -lSDL2 -lSDL2main -o run.out
+./run.out cube.obj 640 480
+rm run.out

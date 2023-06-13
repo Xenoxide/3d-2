@@ -1,0 +1,4 @@
+#!/bin/bash
+gcc unit_tests.c t_math.c t_obj.c -lm -o testo.out
+./testo.out
+rm testo.out

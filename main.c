@@ -1,6 +1,7 @@
 // This is not a file to be included.
 // Instead, it is a standalone program.
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_render.h>
 
 #include "t_obj.h"
 #include "t_math.h"
@@ -92,9 +93,11 @@ int main(int argc, char *argv[]) {
     // Main loop
     while (!quit)
     {
+        SDL_Delay((20));
+        SDL_RenderClear(renderer);
         SDL_UpdateTexture(texture, NULL, pixels, WIDTH * sizeof(Uint32));
 
-        SDL_Delay(10);
+        
         SDL_PollEvent(&event);
  
         switch (event.type)

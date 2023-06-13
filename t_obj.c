@@ -33,9 +33,8 @@ static void t_splitFace(char** token_array, int out[3][3]) {
 
 // Takes in the filename of the obj file, and puts an
 // array of faces in the second argument t_Face* faces.
-// t_Face* is not a pointer to a face, but an array of faces.
 // Return value is number of faces, zero in case of failure.
-int t_decodeOBJ(char* filename, t_Face faces[MAX_FACES]) {
+int t_decodeOBJ(char* filename, t_Face faces[]) {
 
     FILE * file = fopen(filename, "r");
     char line_buffer[80];

@@ -8,6 +8,6 @@
 #include "t_math.h"
 
 // Entire file to implement one function. Useful one though.
-int t_decodeOBJ(char* filename, t_Face faces[MAX_FACES]);
+int t_decodeOBJ(char* filename, t_Face faces[]);
 
 #endif // ifndef T_OBJ_H
